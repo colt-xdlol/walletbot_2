@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>История транзакций</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: #ffffff;
+        }
+        
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .header-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+        
+        .transactions-list {
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+            font-size: 18px;
+        }
+        
+        .transaction-icon.income {
+            background: rgba(74, 222, 128, 0.15);
+        }
+        
+        .transaction-icon.outcome {
+            background: rgba(239, 68, 68, 0.15);
+        }
+        
+        .transaction-info {
+            flex: 1;
+        }
+        
+        .transaction-type {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 3px;
+        }
+        
+        .transaction-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+            margin-bottom: 4px;
+        }
+        
+        .transaction-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .transaction-amount {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .transaction-amount.positive {
+            color: #4ade80;
+        }
+        
+        .transaction-amount.negative {
+            color: #ef4444;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <a href="{{ url_for('home') }}" class="header-btn">
+            <svg viewBox="0 0 24 24">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+        <div class="header-title">История</div>
+        <div style="width: 40px;"></div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">📝 История операций</h1>
+        
+        {% if transactions %}
+        <div class="transactions-list">
+            {% for trans in transactions %}
+            <div class="transaction-item">
+                <div class="transaction-icon {% if trans.type == 'deposit' or trans.type == 'transfer_in' or trans.type == 'admin_give' %}income{% else %}outcome{% endif %}">
+                    {% if trans.type == 'deposit' or trans.type == 'transfer_in' or trans.type == 'admin_give' %}↓{% else %}↑{% endif %}
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-type">
+                        {% if trans.type == 'deposit' %}Пополнение
+                        {% elif trans.type == 'transfer_in' %}Перевод получен
+                        {% elif trans.type == 'transfer_out' %}Перевод отправлен
+                        {% elif trans.type == 'admin_give' %}Начисление
+                        {% elif trans.type == 'withdraw' %}Вывод
+                        {% else %}Операция{% endif %}
+                    </div>
+                    {% if trans.description %}
+                    <div class="transaction-desc">{{ trans.description }}</div>
+                    {% endif %}
+                    <div class="transaction-date">{{ trans.date }}</div>
+                </div>
+                <div class="transaction-amount {% if trans.type == 'deposit' or trans.type == 'admin_give' or trans.type == 'transfer_in' %}positive{% else %}negative{% endif %}">
+                    {% if trans.type == 'deposit' or trans.type == 'admin_give' or trans.type == 'transfer_in' %}+{% else %}-{% endif %}{{ "%.2f"|format(trans.amount) }} ₽
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>История транзакций пуста</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

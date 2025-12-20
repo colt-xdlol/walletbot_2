@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Кошелек</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .logo {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .status {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        .error {
+            color: #ef4444;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">💰</div>
+        <h1 class="title">Кошелек</h1>
+        <p class="subtitle">Авторизация через Telegram</p>
+        <div class="loader" id="loader"></div>
+        <p class="status" id="status">Подключение...</p>
+        <p class="error" id="error" style="display: none;"></p>
+        <button class="btn" id="retryBtn" style="display: none;" onclick="authorize()">Повторить</button>
+    </div>
+    
+    <script>
+        const tg = window.Telegram?.WebApp;
+        
+        async function authorize() {
+            const loader = document.getElementById('loader');
+            const status = document.getElementById('status');
+            const error = document.getElementById('error');
+            const retryBtn = document.getElementById('retryBtn');
+            
+            loader.style.display = 'block';
+            error.style.display = 'none';
+            retryBtn.style.display = 'none';
+            status.textContent = 'Авторизация...';
+            
+            let authData = {};
+            
+            if (tg && tg.initData) {
+                // Авторизация через Telegram Web App
+                tg.ready();
+                tg.expand();
+                
+                // Передаем initData для валидации
+                authData.initData = tg.initData;
+                
+                // Также передаем данные пользователя напрямую
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const user = tg.initDataUnsafe.user;
+                    authData.tg_id = user.id;
+                    authData.username = user.username || '';
+                    authData.first_name = user.first_name || 'Пользователь';
+                    console.log('Telegram user data:', user);
+                }
+            } else {
+                // Если открыто не через Telegram - показываем ошибку
+                loader.style.display = 'none';
+                status.textContent = '';
+                error.textContent = 'Откройте приложение через Telegram бота';
+                error.style.display = 'block';
+                return;
+            }
+            
+            console.log('Auth data:', authData);
+            
+            try {
+                const response = await fetch('/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(authData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.textContent = 'Успешно!';
+                    window.location.href = data.redirect;
+                } else {
+                    loader.style.display = 'none';
+                    status.textContent = '';
+                    error.textContent = data.error || 'Ошибка авторизации';
+                    error.style.display = 'block';
+                    retryBtn.style.display = 'inline-block';
+                }
+            } catch (e) {
+                console.error('Auth error:', e);
+                loader.style.display = 'none';
+                status.textContent = '';
+                error.textContent = 'Ошибка соединения';
+                error.style.display = 'block';
+                retryBtn.style.display = 'inline-block';
+            }
+        }
+        
+        // Автоматическая авторизация при загрузке
+        window.onload = function() {
+            setTimeout(authorize, 500);
+        };
+    </script>
+</body>
+</html>
