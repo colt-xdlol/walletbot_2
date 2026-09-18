@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Кошелек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Кошелек - Telegram Wallet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
@@ -14,580 +14,82 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-card: rgba(26, 28, 36, 0.65);
+            --glass-card-hover: rgba(35, 38, 50, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-border-light: rgba(255, 255, 255, 0.22);
+            --glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 0 rgba(0, 0, 0, 0.35);
+            --accent-blue: #0A84FF;
+            --accent-cyan: #64D2FF;
+            --accent-green: #30D158;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --text-tertiary: rgba(255, 255, 255, 0.42);
+        }
+
         body {
-            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000000;
-            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
+            background: #07080B;
+            color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
+            background-attachment: fixed;
         }
-        
+
+        /* Ambient Liquid Light Orbs (Gives realistic refraction under liquid glass) */
+        .ambient-glow-1 {
+            position: fixed;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(10, 132, 255, 0.24) 0%, rgba(191, 90, 242, 0.15) 50%, transparent 75%);
+            filter: blur(70px);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulseGlow 10s ease-in-out infinite alternate;
+        }
+
+        .ambient-glow-2 {
+            position: fixed;
+            bottom: 60px;
+            right: -60px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(48, 209, 88, 0.14) 0%, rgba(100, 210, 255, 0.08) 50%, transparent 75%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translateX(-50%) scale(0.95); opacity: 0.8; }
+            100% { transform: translateX(-48%) scale(1.1); opacity: 1; }
+        }
+
         .container {
-            max-width: 420px;
+            max-width: 430px;
             margin: 0 auto;
-            padding: 60px 20px 40px;
+            padding: 76px 18px 48px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-        
-        /* Balance Section */
-        .balance-section {
-            text-align: center;
-            padding: 40px 0 50px;
-        }
-        
-        .balance-label {
-            color: #4ade80;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-        
-        .balance-amount {
-            display: flex;
-            align-items: baseline;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .balance-value {
-            font-size: 56px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: -2px;
-        }
-        
-        .balance-currency {
-            font-size: 24px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            padding: 20px 0 40px;
-        }
-        
-        .action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-        
-        .action-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .action-btn:active {
-            transform: scale(0.95);
-            opacity: 0.8;
-        }
-        
-        .action-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            border: 2px solid #3b82f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-        }
-        
-        .action-icon svg {
-            width: 24px;
-            height: 24px;
-            stroke: #3b82f6;
-            stroke-width: 2.5;
-            fill: none;
-        }
-        
-        .action-label {
-            font-size: 13px;
-            color: #3b82f6;
-            font-weight: 500;
-        }
-        
-        /* History Section */
-        .history-section {
-            flex: 1;
-            margin-top: 20px;
-        }
-        
-        .history-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            padding-left: 4px;
-        }
-        
-        .history-card {
-            background: #1a1a1a;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        
-        .empty-history {
-            padding: 50px 20px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 15px;
-        }
-        
-        .transaction-item {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-        
-        .transaction-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 14px;
-            font-size: 18px;
-        }
-        
-        .transaction-icon.income {
-            background: rgba(74, 222, 128, 0.15);
-        }
-        
-        .transaction-icon.outcome {
-            background: rgba(239, 68, 68, 0.15);
-        }
-        
-        .transaction-info {
-            flex: 1;
-        }
-        
-        .transaction-type {
-            font-size: 15px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 3px;
-        }
-        
-        .transaction-date {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-        }
-        
-        .transaction-amount {
-            font-size: 15px;
-            font-weight: 600;
-        }
-        
-        .transaction-amount.positive {
-            color: #4ade80;
-        }
-        
-        .transaction-amount.negative {
-            color: #ef4444;
-        }
-        
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            align-items: flex-end;
-            justify-content: center;
-        }
-        
-        .modal-content {
             position: relative;
-            background: #1a1a1a;
-            width: 100%;
-            max-width: 420px;
-            border-radius: 24px 24px 0 0;
-            padding: 20px 24px 40px;
-            animation: slideUp 0.3s ease;
+            z-index: 1;
         }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        
-        .modal-handle {
-            width: 40px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            margin: 0 auto 20px;
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        
-        .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 8px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 16px;
-            background: #0a0a0a;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #ffffff !important;
-            font-size: 16px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: textfield;
-        }
-        
-        .form-group input::-webkit-outer-spin-button,
-        .form-group input::-webkit-inner-spin-button {
-            appearance: none;
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        
-        .form-group input[type=number] {
-            appearance: textfield;
-            -moz-appearance: textfield;
-        }
-        
-        .form-group input:focus {
-            border-color: #3b82f6;
-            color: #ffffff !important;
-        }
-        
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .form-group input:-webkit-autofill,
-        .form-group input:-webkit-autofill:hover,
-        .form-group input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #ffffff !important;
-            -webkit-box-shadow: 0 0 0px 1000px #0a0a0a inset !important;
-            transition: background-color 5000s ease-in-out 0s;
-        }
-        
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            background: #3b82f6;
-            border: none;
-            border-radius: 12px;
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-        
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-primary:disabled {
-            background: #1e40af;
-            cursor: not-allowed;
-            opacity: 0.8;
-        }
-        
-        .btn-primary .spinner {
-            display: none;
-        }
-        
-        .btn-primary .tgs-animation {
-            display: none;
-            width: 24px;
-            height: 24px;
-        }
-        
-        .btn-primary.loading .spinner {
-            display: none;
-        }
-        
-        .btn-primary.loading .tgs-animation {
-            display: inline-block;
-        }
-        
-        .btn-primary.loading .btn-text {
-            display: none;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .spinner-icon {
-            width: 20px;
-            height: 20px;
-            stroke: currentColor;
-            stroke-width: 2;
-            fill: none;
-        }
-        
-        .camera-loading-spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        
-        .deposit-info {
-            background: #0a0a0a;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .deposit-info p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        
-        .deposit-info code {
-            display: block;
-            background: #1a1a1a;
-            padding: 12px;
-            border-radius: 8px;
-            color: #4ade80;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .deposit-info code:hover {
-            background: #252525;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 50%;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s, color 0.2s;
-            z-index: 10;
-        }
-        
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-        }
-        
-        .close-btn svg {
-            width: 16px;
-            height: 16px;
-            stroke: currentColor;
-            stroke-width: 2.5;
-            fill: none;
-        }
-        
-        /* Success Modal */
-        .success-modal {
-            text-align: center;
-            padding-top: 40px;
-        }
-        
-        .success-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-        
-        .success-tgs-animation {
-            width: 128px;
-            height: 128px;
-            margin: 0 auto 16px;
-        }
-        
-        .success-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .success-message {
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 24px;
-        }
-        
-        /* QR Code Styles */
-        .qr-code-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 0;
-        }
-        
-        .qr-code-wrapper {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .qr-code-wrapper canvas {
-            max-width: 100%;
-            height: auto;
-        }
-        
-        .qr-scan-container {
-            width: 100%;
-            max-width: 100%;
-            margin: 0 auto;
-        }
-        
-        #qr-reader {
-            width: 100% !important;
-        }
-        
-        #qr-reader__dashboard {
-            background: #0a0a0a;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        
-        #qr-reader__camera_selection {
-            background: #1a1a1a;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            border-radius: 8px;
-            padding: 8px;
-            margin-bottom: 12px;
-        }
-        
-        #qr-reader__scan_region {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .scan-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid #3b82f6;
-            border-radius: 8px;
-            color: #3b82f6;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-bottom: 12px;
-        }
-        
-        .scan-button:hover {
-            background: rgba(59, 130, 246, 0.2);
-        }
-        
-        .scan-button svg {
-            width: 20px;
-            height: 20px;
-            stroke: #3b82f6;
-            stroke-width: 2;
-            fill: none;
-        }
-        
-        .qr-show-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid #3b82f6;
-            border-radius: 8px;
-            color: #3b82f6;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 12px;
-        }
-        
-        .qr-show-button:hover {
-            background: rgba(59, 130, 246, 0.2);
-        }
-        
-        .qr-show-button svg {
-            width: 20px;
-            height: 20px;
-            stroke: #3b82f6;
-            stroke-width: 2;
-            fill: none;
-        }
-        
-        /* Header */
+
+        /* Floating iOS Glass Navigation Bar */
         .header {
             position: fixed;
             top: 0;
@@ -596,74 +98,936 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            padding: 14px 20px;
+            background: rgba(12, 14, 20, 0.72);
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 100;
-            max-width: 420px;
+            max-width: 430px;
             margin: 0 auto;
         }
-        
-        .header-btn {
-            width: 40px;
-            height: 40px;
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
+            background: linear-gradient(135deg, #0A84FF, #BF5AF2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            box-shadow: 0 2px 10px rgba(10, 132, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .header-user-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-username {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+            letter-spacing: -0.2px;
+        }
+
+        .header-network-badge {
+            font-size: 11px;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            display: inline-block;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: var(--glass-specular);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
+            color: var(--text-primary);
         }
-        
-        .header-btn:hover {
+
+        .header-btn:active {
+            transform: scale(0.92);
             background: rgba(255, 255, 255, 0.15);
         }
-        
+
         .header-btn svg {
-            width: 20px;
-            height: 20px;
-            stroke: #ffffff;
-            stroke-width: 2;
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2.2;
             fill: none;
         }
-        
+
+        /* iOS Liquid Glass Hero Wallet Card */
+        .wallet-card-wrapper {
+            perspective: 1000px;
+            margin-top: 10px;
+            margin-bottom: 24px;
+        }
+
+        .wallet-card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(20, 24, 38, 0.7) 100%);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 26px;
+            padding: 24px 22px;
+            box-shadow: 
+                0 24px 48px -12px rgba(0, 0, 0, 0.65),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+                inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .wallet-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.08) 45%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.08) 55%,
+                transparent 70%
+            );
+            pointer-events: none;
+            transform: rotate(15deg);
+        }
+
+        .wallet-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .wallet-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.85);
+            text-transform: uppercase;
+        }
+
+        .wallet-brand-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            font-size: 11px;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .contactless-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.75;
+        }
+
+        .wallet-balance-block {
+            margin-bottom: 24px;
+        }
+
+        .balance-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .balance-label {
+            color: var(--text-tertiary);
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .balance-amount {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .balance-value {
+            font-size: 46px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -1.5px;
+            font-feature-settings: "tnum";
+            line-height: 1.1;
+        }
+
+        .balance-currency {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            letter-spacing: 0.5px;
+        }
+
+        .wallet-card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .wallet-address-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .wallet-address-pill:active {
+            background: rgba(255, 255, 255, 0.12);
+            transform: scale(0.97);
+        }
+
+        .wallet-address-text {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 0.3px;
+        }
+
+        .copy-glyph {
+            width: 14px;
+            height: 14px;
+            stroke: var(--accent-cyan);
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        .network-tag {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+
+        /* iOS Liquid Glass Action Buttons */
+        .action-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .action-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 0;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .action-tile:active {
+            transform: scale(0.92);
+        }
+
+        .action-bubble {
+            width: 58px;
+            height: 58px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 
+                0 12px 24px -6px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 0 rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-bubble::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+            border-radius: 20px 20px 0 0;
+            pointer-events: none;
+        }
+
+        .action-tile:hover .action-bubble {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%);
+            border-color: rgba(255, 255, 255, 0.24);
+        }
+
+        .action-bubble.blue { color: var(--accent-blue); }
+        .action-bubble.green { color: var(--accent-green); }
+        .action-bubble.purple { color: var(--accent-purple); }
+        .action-bubble.cyan { color: var(--accent-cyan); }
+
+        .action-bubble svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2.3;
+            fill: none;
+            z-index: 1;
+        }
+
+        .action-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            letter-spacing: -0.2px;
+        }
+
+        /* iOS Liquid Glass Section & List */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .section-link {
+            font-size: 13px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .section-link:hover {
+            opacity: 0.8;
+        }
+
+        .glass-card-container {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 22px;
+            box-shadow: 
+                0 16px 36px -8px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+            overflow: hidden;
+        }
+
+        .transaction-row {
+            display: flex;
+            align-items: center;
+            padding: 15px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            transition: background 0.2s ease;
+        }
+
+        .transaction-row:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-row:active {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .trans-icon-bubble {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+            font-size: 18px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .trans-icon-bubble.income {
+            background: rgba(48, 209, 88, 0.12);
+            color: var(--accent-green);
+        }
+
+        .trans-icon-bubble.outcome {
+            background: rgba(255, 69, 58, 0.12);
+            color: var(--accent-red);
+        }
+
+        .trans-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .trans-type-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #FFFFFF;
+            letter-spacing: -0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .trans-subtext {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .trans-amount-col {
+            text-align: right;
+            margin-left: 10px;
+        }
+
+        .trans-val {
+            font-size: 15px;
+            font-weight: 700;
+            font-feature-settings: "tnum";
+            letter-spacing: -0.2px;
+        }
+
+        .trans-val.positive {
+            color: var(--accent-green);
+        }
+
+        .trans-val.negative {
+            color: #FFFFFF;
+        }
+
+        .trans-status-badge {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .empty-history-state {
+            padding: 44px 20px;
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .empty-icon {
+            font-size: 38px;
+            margin-bottom: 8px;
+            opacity: 0.6;
+        }
+
+        /* iOS Bottom Sheet Modals with Liquid Glass */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            z-index: 1000;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            background: linear-gradient(180deg, rgba(30, 33, 44, 0.88) 0%, rgba(16, 18, 25, 0.96) 100%);
+            backdrop-filter: blur(36px) saturate(200%);
+            -webkit-backdrop-filter: blur(36px) saturate(200%);
+            width: 100%;
+            max-width: 430px;
+            border-radius: 30px 30px 0 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.22);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 18px 24px 44px;
+            box-shadow: 
+                0 -20px 48px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+            animation: sheetSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes sheetSlideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 38px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 999px;
+            margin: 0 auto 18px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 22px;
+            letter-spacing: -0.3px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-left: 2px;
+        }
+
+        .glass-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 18px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            color: #FFFFFF !important;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-blue);
+            background: rgba(0, 0, 0, 0.55);
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* iOS Liquid Glass Button */
+        .btn-primary {
+            width: 100%;
+            padding: 16px 20px;
+            background: linear-gradient(180deg, #0A84FF 0%, #0066D6 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 
+                0 8px 24px -4px rgba(10, 132, 255, 0.5),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+            filter: brightness(0.92);
+        }
+
+        .btn-primary:disabled {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: var(--glass-specular);
+            color: #FFFFFF;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .close-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.16);
+            color: #FFFFFF;
+        }
+
+        .close-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        .deposit-info {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .deposit-info code {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            color: var(--accent-cyan);
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            word-break: break-all;
+            margin: 10px 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+        }
+
+        .deposit-info code:active {
+            background: rgba(100, 210, 255, 0.12);
+        }
+
+        .qr-show-button, .scan-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(10, 132, 255, 0.12);
+            border: 1px solid rgba(10, 132, 255, 0.35);
+            border-radius: 14px;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .qr-show-button:active, .scan-button:active {
+            background: rgba(10, 132, 255, 0.24);
+            transform: scale(0.97);
+        }
+
+        .qr-show-button svg, .scan-button svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        /* QR Modal & Scanner */
+        .qr-code-wrapper {
+            background: #FFFFFF;
+            padding: 18px;
+            border-radius: 20px;
+            margin: 12px auto 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .qr-scan-container {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        #qr-reader {
+            width: 100% !important;
+            border: none !important;
+        }
+
+        /* Success Sheet */
+        .success-modal {
+            text-align: center;
+            padding-top: 24px;
+        }
+
+        .success-tgs-animation {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 16px;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .success-message {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 24px;
+        }
+
+        /* iOS Dynamic Island / Toast notification */
+        .ios-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(28, 30, 40, 0.92);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 10px 18px;
+            border-radius: 999px;
+            color: #FFFFFF;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), var(--glass-specular);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .ios-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .camera-loading-spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Ambient Liquid Atmosphere -->
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- Floating Dynamic Island Toast -->
+    <div id="iosToast" class="ios-toast">
+        <span class="toast-icon">✓</span>
+        <span id="toastText">Скопировано в буфер</span>
+    </div>
+
+    <!-- Floating Glass Header -->
     <div class="header">
-        <button class="header-btn" onclick="copyWalletAddress()">
-            <svg viewBox="0 0 24 24">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-        </button>
-        <a href="{{ url_for('logout') }}" class="header-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-        </a>
+        <div class="header-profile">
+            <div class="header-avatar">
+                <%= (first_name || username || 'U').charAt(0).toUpperCase() %>
+            </div>
+            <div class="header-user-meta">
+                <span class="header-username">@<%= username %></span>
+                <span class="header-network-badge">
+                    <span class="status-dot"></span>
+                    USDT TRC-20
+                </span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="header-btn" onclick="copyWalletAddress()" title="Скопировать адрес">
+                <svg viewBox="0 0 24 24">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            </button>
+            <a href="/logout" class="header-btn" title="Выйти">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </a>
+        </div>
     </div>
 
     <div class="container">
-        <!-- Balance -->
-        <div class="balance-section">
-            <div class="balance-label">Баланс</div>
-            <div class="balance-amount">
-                <span class="balance-value">{{ "%.2f"|format(balance) }}</span>
-                <span class="balance-currency">USDT</span>
+        <!-- iOS Liquid Glass Hero Wallet Card -->
+        <div class="wallet-card-wrapper">
+            <div class="wallet-card">
+                <div class="wallet-card-top">
+                    <div class="wallet-brand">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+                            <line x1="2" y1="10" x2="22" y2="10"></line>
+                        </svg>
+                        Wallet Pass
+                    </div>
+                    <div class="wallet-brand-badge">
+                        <span class="contactless-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M8.5 16.5a5 5 0 0 1 0-9"></path>
+                                <path d="M12 19a8.5 8.5 0 0 0 0-14"></path>
+                            </svg>
+                        </span>
+                        TRC-20
+                    </div>
+                </div>
+
+                <div class="wallet-balance-block">
+                    <div class="balance-label-row">
+                        <span class="balance-label">Общий баланс</span>
+                    </div>
+                    <div class="balance-amount">
+                        <span class="balance-value"><%= Number(balance).toFixed(2) %></span>
+                        <span class="balance-currency">USDT</span>
+                    </div>
+                </div>
+
+                <div class="wallet-card-bottom">
+                    <div class="wallet-address-pill" onclick="copyWalletAddress()" title="Нажмите, чтобы скопировать">
+                        <span class="wallet-address-text"><%= wallet_address %></span>
+                        <svg class="copy-glyph" viewBox="0 0 24 24">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </div>
+                    <span class="network-tag">Secure Key</span>
+                </div>
             </div>
         </div>
-        
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button class="action-btn" onclick="showWithdrawModal()">
-                <div class="action-icon">
+
+        <!-- iOS Glassmorphic Quick Action Tiles -->
+        <div class="action-buttons-grid">
+            <button class="action-tile" onclick="showWithdrawModal()">
+                <div class="action-bubble blue">
                     <svg viewBox="0 0 24 24">
                         <line x1="12" y1="19" x2="12" y2="5"></line>
                         <polyline points="5 12 12 5 19 12"></polyline>
@@ -671,8 +1035,9 @@
                 </div>
                 <span class="action-label">Отправить</span>
             </button>
-            <button class="action-btn" onclick="showDepositModal()">
-                <div class="action-icon">
+
+            <button class="action-tile" onclick="showDepositModal()">
+                <div class="action-bubble green">
                     <svg viewBox="0 0 24 24">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <polyline points="19 12 12 19 5 12"></polyline>
@@ -680,8 +1045,9 @@
                 </div>
                 <span class="action-label">Получить</span>
             </button>
-            <button class="action-btn" onclick="showBuyModal()">
-                <div class="action-icon">
+
+            <button class="action-tile" onclick="showBuyModal()">
+                <div class="action-bubble purple">
                     <svg viewBox="0 0 24 24">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -689,79 +1055,98 @@
                 </div>
                 <span class="action-label">Купить</span>
             </button>
+
+            <button class="action-tile" onclick="showQRCode('<%= wallet_address %>')">
+                <div class="action-bubble cyan">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                        <rect x="14" y="14" width="3" height="3"></rect>
+                        <line x1="17" y1="21" x2="21" y2="21"></line>
+                        <line x1="21" y1="17" x2="21" y2="21"></line>
+                    </svg>
+                </div>
+                <span class="action-label">QR-код</span>
+            </button>
         </div>
-        
-        <!-- History -->
-        <div class="history-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <div class="history-title">История операций</div>
-                {% if transactions %}
-                <a href="{{ url_for('transactions') }}" style="font-size: 13px; color: #3b82f6; text-decoration: none; font-weight: 500;">Показать все</a>
-                {% endif %}
-            </div>
-            <div class="history-card">
-                {% if transactions %}
-                {% for trans in transactions[:10] %}
-                <div class="transaction-item">
-                    <div class="transaction-icon {% if trans.type == 'deposit' or trans.type == 'transfer_in' or trans.type == 'admin_give' %}income{% else %}outcome{% endif %}">
-                        {% if trans.type == 'deposit' or trans.type == 'transfer_in' or trans.type == 'admin_give' %}↓{% else %}↑{% endif %}
+
+        <!-- Recent Transactions Section -->
+        <div class="section-header">
+            <span class="section-title">История операций</span>
+            <% if (transactions && transactions.length > 0) { %>
+            <a href="/transactions" class="section-link">
+                Все
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </a>
+            <% } %>
+        </div>
+
+        <div class="glass-card-container">
+            <% if (transactions && transactions.length > 0) { %>
+                <% transactions.slice(0, 10).forEach(function(trans) { 
+                    const isIncome = trans.type === 'deposit' || trans.type === 'transfer_in' || trans.type === 'admin_give';
+                %>
+                <div class="transaction-row">
+                    <div class="trans-icon-bubble <%= isIncome ? 'income' : 'outcome' %>">
+                        <%= isIncome ? '↓' : '↑' %>
                     </div>
-                    <div class="transaction-info">
-                        <div class="transaction-type">
-                            {% if trans.type == 'deposit' %}Пополнение
-                            {% elif trans.type == 'transfer_in' %}Перевод получен
-                            {% elif trans.type == 'transfer_out' %}Перевод отправлен
-                            {% elif trans.type == 'admin_give' %}Начисление
-                            {% elif trans.type == 'withdraw' %}Вывод
-                            {% else %}Операция{% endif %}
+                    <div class="trans-meta">
+                        <div class="trans-type-title">
+                            <% if (trans.type === 'deposit') { %>Пополнение счета
+                            <% } else if (trans.type === 'transfer_in') { %>Входящий перевод
+                            <% } else if (trans.type === 'transfer_out') { %>Исходящий перевод
+                            <% } else if (trans.type === 'admin_give') { %>Начисление бонуса
+                            <% } else if (trans.type === 'withdraw') { %>Вывод средств
+                            <% } else { %>Транзакция<% } %>
                         </div>
-                        {% if trans.description %}
-                        <div class="transaction-description" style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px;">{{ trans.description[:50] }}{% if trans.description|length > 50 %}...{% endif %}</div>
-                        {% endif %}
-                        <div class="transaction-date">{{ trans.date }}</div>
+                        <div class="trans-subtext">
+                            <%= trans.description ? (trans.description.length > 45 ? trans.description.slice(0, 45) + '...' : trans.description) : trans.date %>
+                        </div>
                     </div>
-                    <div class="transaction-amount {% if trans.type == 'deposit' or trans.type == 'admin_give' or trans.type == 'transfer_in' %}positive{% else %}negative{% endif %}">
-                        {% if trans.type == 'deposit' or trans.type == 'admin_give' or trans.type == 'transfer_in' %}+{% else %}-{% endif %}{{ "%.2f"|format(trans.amount) }} ₽
+                    <div class="trans-amount-col">
+                        <div class="trans-val <%= isIncome ? 'positive' : 'negative' %>">
+                            <%= isIncome ? '+' : '-' %><%= Number(trans.amount).toFixed(2) %> USDT
+                        </div>
+                        <div class="trans-status-badge">Выполнено</div>
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                <div class="empty-history">Нет операций</div>
-                {% endif %}
-            </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-history-state">
+                    <div class="empty-icon">💎</div>
+                    <p style="font-size: 15px; font-weight: 500; color: #FFFFFF; margin-bottom: 4px;">История пуста</p>
+                    <p style="font-size: 13px;">Здесь появятся ваши переводы и начисления</p>
+                </div>
+            <% } %>
         </div>
     </div>
-    
-    <!-- Deposit Modal -->
+
+    <!-- iOS Bottom Sheet: Deposit Modal -->
     <div id="depositModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('depositModal')">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <div class="modal-handle"></div>
-            <h2 class="modal-title">Получить</h2>
+            <h2 class="modal-title">Получить USDT</h2>
+
             <div class="deposit-info">
-                <p>Ваш адрес кошелька:</p>
-                <code onclick="copyWalletAddress()">{{ wallet_address }}</code>
-                <p style="margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.4);">Нажмите, чтобы скопировать</p>
-                <button type="button" class="qr-show-button" onclick="showQRCode('{{ wallet_address }}')">
+                <p style="color: var(--text-secondary); font-size: 13px;">Ваш персональный адрес кошелька:</p>
+                <code onclick="copyWalletAddress()"><%= wallet_address %></code>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px;">Нажмите на адрес для копирования</p>
+                <button type="button" class="qr-show-button" style="width: 100%;" onclick="showQRCode('<%= wallet_address %>')">
                     <svg viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="5" height="5"></rect>
-                        <rect x="16" y="3" width="5" height="5"></rect>
-                        <rect x="3" y="16" width="5" height="5"></rect>
-                        <line x1="7" y1="8" x2="7" y2="8"></line>
-                        <line x1="17" y1="8" x2="17" y2="8"></line>
-                        <line x1="7" y1="16" x2="7" y2="16"></line>
-                        <line x1="12" y1="11" x2="12" y2="13"></line>
-                        <line x1="12" y1="11" x2="14" y2="11"></line>
-                        <line x1="12" y1="13" x2="14" y2="13"></line>
-                        <line x1="10" y1="11" x2="10" y2="13"></line>
-                        <line x1="10" y1="11" x2="8" y2="11"></line>
-                        <line x1="10" y1="13" x2="8" y2="13"></line>
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
                     Показать QR-код
                 </button>
             </div>
+
             <form id="depositForm">
                 <div class="form-group">
                     <label>Сумма пополнения (USDT)</label>
@@ -769,70 +1154,49 @@
                 </div>
                 <button type="submit" class="btn-primary" id="depositBtn">
                     <span class="btn-text">Создать заявку</span>
-                    <span class="spinner">
-                        <svg class="spinner-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10" stroke-linecap="round"/>
-                            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
-                            <path d="M12 6V2M12 22v-4M6 12H2M22 12h-4M7.76 7.76L4.93 4.93M19.07 19.07l-2.83-2.83M7.76 16.24l-2.83 2.83M19.07 4.93l-2.83 2.83" stroke-linecap="round"/>
-                        </svg>
-                    </span>
                 </button>
             </form>
         </div>
     </div>
-    
-    <!-- Withdraw Modal -->
+
+    <!-- iOS Bottom Sheet: Withdraw / Transfer Modal -->
     <div id="withdrawModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('withdrawModal')">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <div class="modal-handle"></div>
-            <h2 class="modal-title">Отправить</h2>
+            <h2 class="modal-title">Отправить USDT</h2>
+
             <form id="withdrawForm">
                 <div class="form-group">
                     <label>Адрес получателя</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="recipientAddress" placeholder="W..." required style="flex: 1;">
-                        <button type="button" class="scan-button" onclick="showQRScanner()" style="margin-bottom: 0; flex-shrink: 0;">
+                        <button type="button" class="scan-button" onclick="showQRScanner()" style="flex-shrink: 0;">
                             <svg viewBox="0 0 24 24">
-                                <rect x="3" y="3" width="5" height="5"></rect>
-                                <rect x="16" y="3" width="5" height="5"></rect>
-                                <rect x="3" y="16" width="5" height="5"></rect>
-                                <line x1="7" y1="8" x2="7" y2="8"></line>
-                                <line x1="17" y1="8" x2="17" y2="8"></line>
-                                <line x1="7" y1="16" x2="7" y2="16"></line>
-                                <line x1="12" y1="11" x2="12" y2="13"></line>
-                                <line x1="12" y1="11" x2="14" y2="11"></line>
-                                <line x1="12" y1="13" x2="14" y2="13"></line>
-                                <line x1="10" y1="11" x2="10" y2="13"></line>
-                                <line x1="10" y1="11" x2="8" y2="11"></line>
-                                <line x1="10" y1="13" x2="8" y2="13"></line>
+                                <rect x="3" y="3" width="6" height="6"></rect>
+                                <rect x="15" y="3" width="6" height="6"></rect>
+                                <rect x="3" y="15" width="6" height="6"></rect>
                             </svg>
-                            Сканировать
+                            Сканер
                         </button>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Сумма (USDT)</label>
                     <input type="text" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" id="withdrawAmount" placeholder="0.00" required>
                 </div>
+
                 <button type="submit" class="btn-primary" id="withdrawBtn">
-                    <span class="btn-text">Отправить</span>
-                    <span class="spinner">
-                        <svg class="spinner-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10" stroke-linecap="round"/>
-                            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
-                            <path d="M12 6V2M12 22v-4M6 12H2M22 12h-4M7.76 7.76L4.93 4.93M19.07 19.07l-2.83-2.83M7.76 16.24l-2.83 2.83M19.07 4.93l-2.83 2.83" stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                    <span class="tgs-animation" id="withdrawTgsAnimation"></span>
+                    <span class="btn-text">Отправить перевод</span>
                 </button>
             </form>
         </div>
     </div>
-    
-    <!-- Buy Modal -->
+
+    <!-- iOS Bottom Sheet: Buy Modal -->
     <div id="buyModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('buyModal')">
@@ -840,433 +1204,319 @@
             </button>
             <div class="modal-handle"></div>
             <h2 class="modal-title">Купить USDT</h2>
-            <div style="text-align: center; padding: 40px 0; color: rgba(255,255,255,0.4);">
-                <div id="buyTgsAnimation" style="width: 96px; height: 96px; margin: 0 auto 16px;"></div>
-                <p>Функция в разработке</p>
+            <div style="text-align: center; padding: 28px 0; color: var(--text-secondary);">
+                <div style="width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 50%; background: rgba(191, 90, 242, 0.15); display: flex; align-items: center; justify-content: center; font-size: 32px;">
+                    💳
+                </div>
+                <p style="font-size: 16px; font-weight: 600; color: #FFFFFF; margin-bottom: 6px;">Покупка картой</p>
+                <p style="font-size: 13px; color: var(--text-tertiary); max-width: 260px; margin: 0 auto 20px;">Прямой шлюз P2P и банковских карт в процессе интеграции.</p>
+                <button class="btn-primary btn-secondary" onclick="closeModal('buyModal')">Понятно</button>
             </div>
         </div>
     </div>
-    
-    <!-- Success Modal -->
+
+    <!-- iOS Bottom Sheet: Success Modal -->
     <div id="successModal" class="modal">
         <div class="modal-content success-modal">
             <button class="close-btn" onclick="closeModal('successModal')">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <div class="modal-handle"></div>
-            <div id="successTgsAnimation" class="success-tgs-animation"></div>
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(48, 209, 88, 0.2); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; border: 1px solid rgba(48, 209, 88, 0.4); box-shadow: 0 0 24px rgba(48, 209, 88, 0.3);">
+                ✓
+            </div>
             <h2 class="success-title">Успешно!</h2>
             <p class="success-message" id="successMessage"></p>
-            <button class="btn-primary" onclick="closeModal('successModal')">Закрыть</button>
+            <button class="btn-primary" onclick="closeModal('successModal')">Отлично</button>
         </div>
     </div>
-    
-    <!-- QR Code Modal -->
+
+    <!-- iOS Bottom Sheet: QR Code Modal -->
     <div id="qrCodeModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('qrCodeModal')">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <div class="modal-handle"></div>
-            <h2 class="modal-title">QR-код адреса</h2>
-            <div class="qr-code-container">
+            <h2 class="modal-title">QR-код кошелька</h2>
+            <div style="text-align: center;">
                 <div class="qr-code-wrapper">
-                    <img id="qrCodeImage" src="" alt="QR Code" style="display: none; max-width: 100%; height: auto;">
-                    <canvas id="qrCodeCanvas" style="display: none;"></canvas>
-                    <div id="qrCodeLoading" style="padding: 40px; text-align: center; color: rgba(255,255,255,0.6);">Загрузка QR-кода...</div>
+                    <img id="qrCodeImage" src="" alt="QR Code" style="display: none; width: 210px; height: 210px; border-radius: 8px;">
+                    <div id="qrCodeLoading" style="padding: 40px; text-align: center; color: #333; font-size: 14px;">Генерация QR-кода...</div>
                 </div>
-                <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 12px;">Отсканируйте для перевода</p>
-                <code onclick="copyWalletAddress()" style="display: block; background: #1a1a1a; padding: 12px; border-radius: 8px; color: #4ade80; font-size: 14px; cursor: pointer; word-break: break-all;">{{ wallet_address }}</code>
+                <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 8px;">Отсканируйте камерой смартфона</p>
+                <code onclick="copyWalletAddress()" style="display: block; background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 12px; color: var(--accent-cyan); font-size: 13px; cursor: pointer; word-break: break-all; border: 1px solid rgba(255, 255, 255, 0.1);"><%= wallet_address %></code>
             </div>
-            <button class="btn-primary" onclick="closeModal('qrCodeModal')" style="margin-top: 20px;">Закрыть</button>
+            <button class="btn-primary" onclick="closeModal('qrCodeModal')" style="margin-top: 20px;">Готово</button>
         </div>
     </div>
-    
-    <!-- QR Scanner Modal -->
+
+    <!-- iOS Bottom Sheet: Camera QR Scanner -->
     <div id="qrScannerModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="stopQRScanner(); closeModal('qrScannerModal')">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             <div class="modal-handle"></div>
-            <h2 class="modal-title">Сканировать QR-код</h2>
+            <h2 class="modal-title">Сканировать QR</h2>
             <div class="qr-scan-container">
                 <div id="qr-reader"></div>
             </div>
-            <button class="btn-primary" onclick="stopQRScanner()" style="margin-top: 20px;">Отменить</button>
+            <button class="btn-primary btn-secondary" onclick="stopQRScanner(); closeModal('qrScannerModal')" style="margin-top: 18px;">Отмена</button>
         </div>
     </div>
-    
+
     <script>
-        const walletAddress = '{{ wallet_address }}';
+        const walletAddress = '<%= wallet_address %>';
         let qrScanner = null;
-        let withdrawAnimation = null;
-        let buyAnimation = null;
-        let successAnimation = null;
-        
-        // Функция для загрузки и отображения TGS анимации
-        async function loadTgsAnimation(containerId, tgsPath) {
-            try {
-                const response = await fetch(tgsPath);
-                const arrayBuffer = await response.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                
-                // Распаковываем gzip
-                const decompressed = pako.inflate(uint8Array, { to: 'string' });
-                const animationData = JSON.parse(decompressed);
-                
-                // Создаем контейнер для анимации
-                const container = document.getElementById(containerId);
-                if (!container) return null;
-                
-                // Очищаем контейнер
-                container.innerHTML = '';
-                
-                // Создаем анимацию через lottie
-                const animation = lottie.loadAnimation({
-                    container: container,
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    animationData: animationData
-                });
-                
-                return animation;
-            } catch (error) {
-                console.error('Ошибка загрузки TGS анимации:', error);
-                return null;
-            }
+
+        function showToast(text) {
+            const toast = document.getElementById('iosToast');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = text;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2600);
         }
-        
-        // Загружаем анимацию при загрузке страницы
-        window.addEventListener('load', async function() {
-            withdrawAnimation = await loadTgsAnimation('withdrawTgsAnimation', '{{ url_for("static", filename="1.tgs") }}');
-            buyAnimation = await loadTgsAnimation('buyTgsAnimation', '{{ url_for("static", filename="4.tgs") }}');
-            successAnimation = await loadTgsAnimation('successTgsAnimation', '{{ url_for("static", filename="5.tgs") }}');
-        });
-        
-        // Проверка загрузки библиотек при загрузке страницы
-        window.addEventListener('load', function() {
-            if (typeof QRCode === 'undefined') {
-                console.warn('Библиотека QRCode не загружена');
-            }
-            if (typeof Html5Qrcode === 'undefined') {
-                console.warn('Библиотека Html5Qrcode не загружена');
-            }
-        });
-        
+
         function copyWalletAddress() {
-            navigator.clipboard.writeText(walletAddress).then(() => {
-                alert('Адрес скопирован:\n' + walletAddress);
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(walletAddress).then(() => {
+                    showToast('Адрес скопирован в буфер');
+                }).catch(() => {
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
         }
-        
+
+        function fallbackCopy() {
+            const temp = document.createElement('input');
+            temp.value = walletAddress;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast('Адрес скопирован в буфер');
+        }
+
         function showDepositModal() {
             document.getElementById('depositModal').style.display = 'flex';
         }
-        
+
         function showWithdrawModal() {
             document.getElementById('withdrawModal').style.display = 'flex';
         }
-        
+
         function showBuyModal() {
             document.getElementById('buyModal').style.display = 'flex';
         }
-        
+
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-            // Останавливаем сканер при закрытии модального окна
             if (modalId === 'qrScannerModal' && qrScanner) {
                 stopQRScanner();
             }
         }
-        
-        // Генерация и отображение QR-кода через API
+
         function showQRCode(address) {
-            console.log('showQRCode вызвана с адресом:', address);
-            
             const modal = document.getElementById('qrCodeModal');
-            if (!modal) {
-                alert('Модальное окно не найдено');
-                return;
-            }
-            
             const qrImage = document.getElementById('qrCodeImage');
-            const qrCanvas = document.getElementById('qrCodeCanvas');
             const qrLoading = document.getElementById('qrCodeLoading');
-            
-            if (!qrImage || !qrLoading) {
-                alert('Элементы QR-кода не найдены');
-                return;
-            }
-            
-            // Показываем модальное окно
+
             modal.style.display = 'flex';
-            
-            // Показываем загрузку
             qrLoading.style.display = 'block';
             qrImage.style.display = 'none';
-            if (qrCanvas) qrCanvas.style.display = 'none';
-            
-            // Используем API для генерации QR-кода (без внешних библиотек)
+
             const encodedAddress = encodeURIComponent(address);
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodedAddress}`;
-            
-            // Создаем изображение
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodedAddress}&margin=10`;
+
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            
             img.onload = function() {
                 qrLoading.style.display = 'none';
                 qrImage.src = qrApiUrl;
                 qrImage.style.display = 'block';
-                console.log('QR-код успешно загружен через API');
             };
-            
             img.onerror = function() {
-                // Если первый API не работает, пробуем альтернативный
-                console.warn('Первый API не работает, пробуем альтернативный...');
-                const altQrApiUrl = `https://chart.googleapis.com/chart?cht=qr&chs=256x256&chl=${encodedAddress}`;
-                
-                const img2 = new Image();
-                img2.crossOrigin = 'anonymous';
-                
-                img2.onload = function() {
-                    qrLoading.style.display = 'none';
-                    qrImage.src = altQrApiUrl;
-                    qrImage.style.display = 'block';
-                    console.log('QR-код успешно загружен через альтернативный API');
-                };
-                
-                img2.onerror = function() {
-                    qrLoading.style.display = 'none';
-                    alert('Не удалось загрузить QR-код. Проверьте подключение к интернету.');
-                    console.error('Оба API не работают');
-                };
-                
-                img2.src = altQrApiUrl;
+                qrLoading.textContent = 'Ошибка загрузки QR';
             };
-            
             img.src = qrApiUrl;
         }
-        
-        // Запрос разрешения на камеру
+
         async function requestCameraPermission() {
             try {
-                // Запрашиваем разрешение на камеру
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: "environment" } 
                 });
-                // Останавливаем поток после получения разрешения
                 stream.getTracks().forEach(track => track.stop());
                 return true;
             } catch (err) {
-                console.error('Ошибка получения разрешения на камеру:', err);
-                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                    alert('❌ Доступ к камере запрещён.\n\nПожалуйста, разрешите доступ к камере в настройках браузера для сканирования QR-кодов.');
-                } else if (err.name === 'NotFoundError') {
-                    alert('❌ Камера не найдена.\n\nУбедитесь, что у вашего устройства есть камера.');
-                } else {
-                    alert('❌ Не удалось получить доступ к камере.\n\nПроверьте настройки разрешений.');
-                }
+                console.error('Camera permission error:', err);
+                showToast('Доступ к камере не предоставлен');
                 return false;
             }
         }
-        
-        // Запуск сканера QR-кода
+
         async function showQRScanner() {
-            // Сначала запрашиваем разрешение на камеру
             const hasPermission = await requestCameraPermission();
-            if (!hasPermission) {
-                return;
-            }
-            
+            if (!hasPermission) return;
+
             const modal = document.getElementById('qrScannerModal');
             modal.style.display = 'flex';
-            
-            // Очищаем предыдущий сканер если есть
+
             const qrReaderElement = document.getElementById('qr-reader');
-            qrReaderElement.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);"><div class="camera-loading-spinner"></div><p style="margin-top: 16px;">Запуск камеры...</p></div>';
-            
-            // Инициализация сканера
+            qrReaderElement.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);"><div class="camera-loading-spinner"></div><p style="margin-top: 16px; font-size: 13px;">Подключение камеры...</p></div>';
+
             qrScanner = new Html5Qrcode("qr-reader");
-            
-            // Пробуем сначала заднюю камеру, потом переднюю
             const config = {
                 fps: 10,
-                qrbox: { width: 250, height: 250 },
+                qrbox: { width: 220, height: 220 },
                 aspectRatio: 1.0
             };
-            
+
             try {
                 await qrScanner.start(
-                    { facingMode: "environment" }, // Используем заднюю камеру
+                    { facingMode: "environment" },
                     config,
-                    function(decodedText, decodedResult) {
-                        // QR-код успешно отсканирован
-                        console.log('Отсканировано:', decodedText);
-                        
-                        // Проверяем, что это адрес кошелька (начинается с W)
+                    function(decodedText) {
                         if (decodedText && decodedText.trim().startsWith('W')) {
                             document.getElementById('recipientAddress').value = decodedText.trim();
                             stopQRScanner();
                             closeModal('qrScannerModal');
+                            showToast('Адрес распознан!');
                         } else {
-                            alert('Неверный формат адреса. Адрес должен начинаться с W');
+                            showToast('Неверный формат адреса (должен начинаться с W)');
                         }
                     },
-                    function(errorMessage) {
-                        // Игнорируем ошибки сканирования (они происходят постоянно при поиске QR)
-                    }
+                    function() {}
                 );
-            } catch(err) {
-                console.error('Ошибка запуска камеры:', err);
-                // Пробуем переднюю камеру если задняя не работает
+            } catch (err) {
                 try {
                     await qrScanner.start(
                         { facingMode: "user" },
                         config,
-                        function(decodedText, decodedResult) {
-                            console.log('Отсканировано:', decodedText);
+                        function(decodedText) {
                             if (decodedText && decodedText.trim().startsWith('W')) {
                                 document.getElementById('recipientAddress').value = decodedText.trim();
                                 stopQRScanner();
                                 closeModal('qrScannerModal');
-                            } else {
-                                alert('Неверный формат адреса. Адрес должен начинаться с W');
+                                showToast('Адрес распознан!');
                             }
                         },
-                        function(errorMessage) {}
+                        function() {}
                     );
-                } catch(err2) {
-                    console.error('Ошибка запуска камеры:', err2);
-                    alert('❌ Не удалось запустить камеру.\n\nПроверьте разрешения на использование камеры в настройках браузера.');
+                } catch(e) {
+                    showToast('Камера недоступна');
                     stopQRScanner();
                     closeModal('qrScannerModal');
                 }
             }
         }
-        
-        // Остановка сканера QR-кода
+
         function stopQRScanner() {
             if (qrScanner) {
-                qrScanner.stop().then(function() {
+                qrScanner.stop().then(() => {
                     qrScanner.clear();
                     qrScanner = null;
-                }).catch(function(err) {
-                    console.error('Ошибка остановки сканера:', err);
+                }).catch(() => {
                     qrScanner = null;
                 });
             }
         }
-        
+
         function showSuccessModal(message) {
             document.getElementById('successMessage').textContent = message;
             document.getElementById('successModal').style.display = 'flex';
         }
-        
+
         window.onclick = function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
+                if (event.target.id === 'qrScannerModal') {
+                    stopQRScanner();
+                }
             }
-        }
-        
-        // Обработка ввода суммы для форматирования
+        };
+
+        // Form inputs formatting
         document.getElementById('depositAmount').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9.]/g, '');
-            // Разрешаем только одну точку
             const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            // Ограничиваем до 2 знаков после запятой
-            if (parts.length === 2 && parts[1].length > 2) {
-                value = parts[0] + '.' + parts[1].substring(0, 2);
-            }
+            if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+            if (parts.length === 2 && parts[1].length > 2) value = parts[0] + '.' + parts[1].substring(0, 2);
             e.target.value = value;
         });
-        
+
         document.getElementById('withdrawAmount').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9.]/g, '');
             const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            if (parts.length === 2 && parts[1].length > 2) {
-                value = parts[0] + '.' + parts[1].substring(0, 2);
-            }
+            if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+            if (parts.length === 2 && parts[1].length > 2) value = parts[0] + '.' + parts[1].substring(0, 2);
             e.target.value = value;
         });
-        
+
         document.getElementById('depositForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const amountValue = document.getElementById('depositAmount').value.trim();
             const amount = parseFloat(amountValue);
             const depositBtn = document.getElementById('depositBtn');
-            
+
             if (!amountValue || isNaN(amount) || amount <= 0) {
-                alert('Введите корректную сумму');
+                showToast('Введите корректную сумму');
                 return;
             }
-            
-            if (amount < 10 || amount > 100000) {
-                alert('Сумма должна быть от 10 до 100000 USDT');
-                return;
-            }
-            
-            // Показываем загрузку
-            depositBtn.classList.add('loading');
+
             depositBtn.disabled = true;
-            
+            depositBtn.querySelector('.btn-text').textContent = 'Обработка...';
+
             try {
                 const response = await fetch('/deposit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amount: amount })
                 });
-                
                 const data = await response.json();
-                
-                // Убираем загрузку
-                depositBtn.classList.remove('loading');
                 depositBtn.disabled = false;
-                
+                depositBtn.querySelector('.btn-text').textContent = 'Создать заявку';
+
                 if (data.success) {
                     closeModal('depositModal');
                     showSuccessModal(data.message);
                     document.getElementById('depositAmount').value = '';
+                    setTimeout(() => location.reload(), 1800);
                 } else {
-                    alert('Ошибка: ' + data.error);
+                    showToast(data.error || 'Ошибка');
                 }
-            } catch (error) {
-                // Убираем загрузку при ошибке
-                depositBtn.classList.remove('loading');
+            } catch (err) {
                 depositBtn.disabled = false;
-                alert('Ошибка соединения');
+                depositBtn.querySelector('.btn-text').textContent = 'Создать заявку';
+                showToast('Ошибка соединения');
             }
         });
-        
+
         document.getElementById('withdrawForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const recipientAddress = document.getElementById('recipientAddress').value.trim();
             const amountValue = document.getElementById('withdrawAmount').value.trim();
             const amount = parseFloat(amountValue);
             const withdrawBtn = document.getElementById('withdrawBtn');
-            
+
             if (!recipientAddress) {
-                alert('Введите адрес получателя');
+                showToast('Введите адрес получателя');
                 return;
             }
-            
+
             if (!amountValue || isNaN(amount) || amount <= 0) {
-                alert('Введите корректную сумму');
+                showToast('Введите корректную сумму');
                 return;
             }
-            
-            // Показываем загрузку
-            withdrawBtn.classList.add('loading');
+
             withdrawBtn.disabled = true;
-            
+            withdrawBtn.querySelector('.btn-text').textContent = 'Отправка...';
+
             try {
                 const response = await fetch('/transfer', {
                     method: 'POST',
@@ -1277,27 +1527,23 @@
                         description: ''
                     })
                 });
-                
                 const data = await response.json();
-                
-                // Убираем загрузку
-                withdrawBtn.classList.remove('loading');
                 withdrawBtn.disabled = false;
-                
+                withdrawBtn.querySelector('.btn-text').textContent = 'Отправить перевод';
+
                 if (data.success) {
                     closeModal('withdrawModal');
                     showSuccessModal(data.message);
                     document.getElementById('recipientAddress').value = '';
                     document.getElementById('withdrawAmount').value = '';
-                    setTimeout(() => location.reload(), 2000);
+                    setTimeout(() => location.reload(), 1800);
                 } else {
-                    alert('Ошибка: ' + data.error);
+                    showToast(data.error || 'Ошибка перевода');
                 }
-            } catch (error) {
-                // Убираем загрузку при ошибке
-                withdrawBtn.classList.remove('loading');
+            } catch (err) {
                 withdrawBtn.disabled = false;
-                alert('Ошибка соединения');
+                withdrawBtn.querySelector('.btn-text').textContent = 'Отправить перевод';
+                showToast('Ошибка соединения');
             }
         });
     </script>

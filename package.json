@@ -1,0 +1,16 @@
+{
+  "name": "walletbot-2",
+  "version": "1.0.0",
+  "description": "Telegram WalletBot web application",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node -c server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "ejs": "^3.1.10"
+  }
+}

@@ -60,7 +60,7 @@ function renderUsers(users) {
             <tr>
                 <td>${user.tg_id}</td>
                 <td>${user.username || user.first_name || 'Без имени'}</td>
-                <td>${user.balance.toFixed(2)} ₽</td>
+                <td>${user.balance.toFixed(2)} USDT</td>
                 <td><span class="badge ${user.banned ? 'banned' : 'active'}">${user.banned ? 'Забанен' : 'Активен'}</span></td>
                 <td>${user.created_at}</td>
                 <td>
@@ -95,7 +95,7 @@ function renderTransactions(transactions) {
                 <td>${trans.username || 'Без имени'}</td>
                 <td>${trans.type.toUpperCase()}</td>
                 <td class="${trans.type === 'deposit' || trans.type === 'admin_give' ? 'positive' : 'negative'}">
-                    ${trans.type === 'deposit' || trans.type === 'admin_give' ? '+' : '-'}${trans.amount.toFixed(2)} ₽
+                    ${trans.type === 'deposit' || trans.type === 'admin_give' ? '+' : '-'}${trans.amount.toFixed(2)} USDT
                 </td>
                 <td>${trans.description || '-'}</td>
                 <td>${trans.date}</td>

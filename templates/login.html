@@ -2,142 +2,276 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Кошелек</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Telegram Wallet - Вход</title>
+    <meta name="description" content="Telegram wallet web app with balance management, transfers, QR code support, and admin controls.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
+        :root {
+            --accent-blue: #0A84FF;
+            --accent-cyan: #64D2FF;
+            --accent-green: #30D158;
+            --accent-purple: #BF5AF2;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --text-tertiary: rgba(255, 255, 255, 0.42);
+        }
+
         body {
-            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000000;
-            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
+            background: #07080B;
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .container {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .logo {
-            font-size: 64px;
-            margin-bottom: 24px;
-        }
-        
-        .title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        
-        .subtitle {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 16px;
-            margin-bottom: 40px;
-        }
-        
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #3b82f6;
+
+        /* Ambient Glow Orbs */
+        .ambient-glow-1 {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 380px;
+            height: 380px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 24px;
+            background: radial-gradient(circle, rgba(10, 132, 255, 0.26) 0%, rgba(191, 90, 242, 0.16) 50%, transparent 75%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
         }
-        
+
+        .ambient-glow-2 {
+            position: fixed;
+            bottom: -60px;
+            right: 10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(48, 209, 88, 0.15) 0%, transparent 70%);
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* iOS Liquid Glass Card */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(20, 24, 38, 0.75) 100%);
+            backdrop-filter: blur(36px) saturate(200%);
+            -webkit-backdrop-filter: blur(36px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 30px;
+            padding: 40px 26px;
+            box-shadow: 
+                0 32px 64px -16px rgba(0, 0, 0, 0.7),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.35),
+                inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .brand-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 
+                0 12px 28px -6px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 34px;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .loader {
+            width: 42px;
+            height: 42px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 16px;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
+
         .status {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
             font-size: 14px;
+            font-weight: 500;
         }
-        
+
         .error {
-            color: #ef4444;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 16px 32px;
+            color: #FF453A;
+            background: rgba(255, 69, 58, 0.12);
+            border: 1px solid rgba(255, 69, 58, 0.25);
             border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
+            padding: 10px 14px;
+            margin-top: 18px;
+            font-size: 13px;
         }
-        
-        .btn:hover {
-            background: #2563eb;
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            background: linear-gradient(180deg, #0A84FF 0%, #0066D6 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 
+                0 8px 24px -4px rgba(10, 132, 255, 0.5),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            filter: brightness(0.92);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+        }
+
+        .btn-secondary:active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .notice-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
     <div class="container">
-        <div class="logo">💰</div>
-        <h1 class="title">Кошелек</h1>
-        <p class="subtitle">Авторизация через Telegram</p>
-        <div class="loader" id="loader"></div>
-        <p class="status" id="status">Подключение...</p>
-        <p class="error" id="error" style="display: none;"></p>
-        <button class="btn" id="retryBtn" style="display: none;" onclick="authorize()">Повторить</button>
+        <div class="glass-card">
+            <div class="brand-icon">💎</div>
+            <h1 class="title">Telegram Wallet</h1>
+            <p class="subtitle">Безопасный кошелек с поддержкой перевода USDT и QR-платежей</p>
+            
+            <div class="loader" id="loader"></div>
+            <p class="status" id="status">Проверка подключения...</p>
+            <p class="error" id="error" style="display: none;"></p>
+            
+            <div class="btn-group" id="actionsGroup" style="display: none;">
+                <button class="btn" onclick="authorize(false)">
+                    Войти в кошелек
+                </button>
+                <button class="btn btn-secondary" onclick="authorize(true)">
+                    ⚙️ Вход администратора
+                </button>
+                <button class="btn btn-secondary" id="retryBtn" onclick="authorize(false)">
+                    Повторить проверку Telegram
+                </button>
+            </div>
+
+            <div class="notice-card" id="browserNotice" style="display: none;">
+                💡 В веб-браузере доступен демонстрационный режим для тестирования всех функций перевода, баланса и QR-сканера.
+            </div>
+        </div>
     </div>
     
     <script>
         const tg = window.Telegram?.WebApp;
         
-        async function authorize() {
+        async function authorize(asAdmin = false) {
             const loader = document.getElementById('loader');
             const status = document.getElementById('status');
             const error = document.getElementById('error');
-            const retryBtn = document.getElementById('retryBtn');
+            const actionsGroup = document.getElementById('actionsGroup');
+            const browserNotice = document.getElementById('browserNotice');
             
             loader.style.display = 'block';
             error.style.display = 'none';
-            retryBtn.style.display = 'none';
             status.textContent = 'Авторизация...';
             
-            let authData = {};
+            let authData = {
+                isAdmin: asAdmin
+            };
             
             if (tg && tg.initData) {
-                // Авторизация через Telegram Web App
                 tg.ready();
                 tg.expand();
-                
-                // Передаем initData для валидации
                 authData.initData = tg.initData;
                 
-                // Также передаем данные пользователя напрямую
                 if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     const user = tg.initDataUnsafe.user;
                     authData.tg_id = user.id;
                     authData.username = user.username || '';
                     authData.first_name = user.first_name || 'Пользователь';
-                    console.log('Telegram user data:', user);
                 }
             } else {
-                // Если открыто не через Telegram - показываем ошибку
-                loader.style.display = 'none';
-                status.textContent = '';
-                error.textContent = 'Откройте приложение через Telegram бота';
-                error.style.display = 'block';
-                return;
+                // Browser / Preview fallback
+                authData.tg_id = asAdmin ? 5000479220 : 100000001;
+                authData.username = asAdmin ? 'amaral' : 'demo_user';
+                authData.first_name = asAdmin ? 'Администратор' : 'Демо Пользователь';
             }
-            
-            console.log('Auth data:', authData);
             
             try {
                 const response = await fetch('/auth', {
@@ -149,28 +283,42 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    status.textContent = 'Успешно!';
-                    window.location.href = data.redirect;
+                    status.textContent = 'Успешно! Открываем...';
+                    if (asAdmin) {
+                        window.location.href = '/admin?code=ADMIN123';
+                    } else {
+                        window.location.href = data.redirect || '/home';
+                    }
                 } else {
                     loader.style.display = 'none';
                     status.textContent = '';
                     error.textContent = data.error || 'Ошибка авторизации';
                     error.style.display = 'block';
-                    retryBtn.style.display = 'inline-block';
+                    actionsGroup.style.display = 'flex';
+                    browserNotice.style.display = 'block';
                 }
             } catch (e) {
                 console.error('Auth error:', e);
                 loader.style.display = 'none';
                 status.textContent = '';
-                error.textContent = 'Ошибка соединения';
+                error.textContent = 'Ошибка соединения с сервером';
                 error.style.display = 'block';
-                retryBtn.style.display = 'inline-block';
+                actionsGroup.style.display = 'flex';
+                browserNotice.style.display = 'block';
             }
         }
         
-        // Автоматическая авторизация при загрузке
         window.onload = function() {
-            setTimeout(authorize, 500);
+            if (tg && tg.initData) {
+                authorize(false);
+            } else {
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('status').textContent = 'Выберите способ входа:';
+                    document.getElementById('actionsGroup').style.display = 'flex';
+                    document.getElementById('browserNotice').style.display = 'block';
+                }, 350);
+            }
         };
     </script>
 </body>

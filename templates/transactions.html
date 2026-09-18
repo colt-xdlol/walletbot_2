@@ -2,31 +2,77 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>История транзакций</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>История операций - Telegram Wallet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-card: rgba(26, 28, 36, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 0 rgba(0, 0, 0, 0.35);
+            --accent-blue: #0A84FF;
+            --accent-cyan: #64D2FF;
+            --accent-green: #30D158;
+            --accent-red: #FF453A;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --text-tertiary: rgba(255, 255, 255, 0.42);
+        }
+
         body {
-            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000000;
-            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
+            background: #07080B;
+            color: var(--text-primary);
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
-        
+
+        .ambient-glow-1 {
+            position: fixed;
+            top: -100px;
+            right: 0;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(10, 132, 255, 0.2) 0%, rgba(100, 210, 255, 0.08) 50%, transparent 75%);
+            filter: blur(75px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ambient-glow-2 {
+            position: fixed;
+            bottom: 40px;
+            left: -80px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(191, 90, 242, 0.15) 0%, transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .container {
-            max-width: 420px;
+            max-width: 430px;
             margin: 0 auto;
-            padding: 80px 20px 40px;
+            padding: 82px 18px 48px;
             min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        /* Glass Header */
         .header {
             position: fixed;
             top: 0;
@@ -35,188 +81,298 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            padding: 14px 20px;
+            background: rgba(12, 14, 20, 0.72);
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 100;
-            max-width: 420px;
+            max-width: 430px;
             margin: 0 auto;
         }
-        
+
         .header-title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 700;
+            letter-spacing: -0.3px;
         }
-        
+
         .header-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: var(--glass-specular);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
-            color: #ffffff;
+            color: #FFFFFF;
         }
-        
-        .header-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
+
+        .header-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.16);
         }
-        
+
         .header-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             stroke: currentColor;
-            stroke-width: 2;
+            stroke-width: 2.3;
             fill: none;
         }
-        
-        .page-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 32px;
+
+        .page-header {
+            margin-bottom: 18px;
         }
-        
-        .transactions-list {
-            background: #1a1a1a;
-            border-radius: 20px;
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* Filter Chips */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-chip.active {
+            background: var(--accent-blue);
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 14px rgba(10, 132, 255, 0.4);
+        }
+
+        /* Transactions Glass Container */
+        .glass-card-container {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 22px;
+            box-shadow: 
+                0 16px 36px -8px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
             overflow: hidden;
         }
-        
-        .transaction-item {
+
+        .transaction-row {
             display: flex;
             align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            transition: background 0.2s ease;
         }
-        
-        .transaction-item:last-child {
+
+        .transaction-row:last-child {
             border-bottom: none;
         }
-        
-        .transaction-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+
+        .trans-icon-bubble {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 14px;
-            font-size: 18px;
+            font-size: 19px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
         }
-        
-        .transaction-icon.income {
-            background: rgba(74, 222, 128, 0.15);
+
+        .trans-icon-bubble.income {
+            background: rgba(48, 209, 88, 0.12);
+            color: var(--accent-green);
         }
-        
-        .transaction-icon.outcome {
-            background: rgba(239, 68, 68, 0.15);
+
+        .trans-icon-bubble.outcome {
+            background: rgba(255, 69, 58, 0.12);
+            color: var(--accent-red);
         }
-        
-        .transaction-info {
+
+        .trans-meta {
             flex: 1;
+            min-width: 0;
         }
-        
-        .transaction-type {
+
+        .trans-type-title {
             font-size: 15px;
             font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 3px;
+            color: #FFFFFF;
+            letter-spacing: -0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        
-        .transaction-desc {
+
+        .trans-desc {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-tertiary);
             margin-top: 2px;
-            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        
-        .transaction-date {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
+
+        .trans-date {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 3px;
         }
-        
-        .transaction-amount {
+
+        .trans-amount-col {
+            text-align: right;
+            margin-left: 12px;
+        }
+
+        .trans-val {
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
+            font-feature-settings: "tnum";
+            letter-spacing: -0.2px;
         }
-        
-        .transaction-amount.positive {
-            color: #4ade80;
+
+        .trans-val.positive {
+            color: var(--accent-green);
         }
-        
-        .transaction-amount.negative {
-            color: #ef4444;
+
+        .trans-val.negative {
+            color: #FFFFFF;
         }
-        
+
+        .trans-status-badge {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-top: 3px;
+        }
+
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
-            color: rgba(255, 255, 255, 0.4);
+            padding: 64px 20px;
+            color: var(--text-tertiary);
         }
-        
+
         .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-        
-        .empty-state p {
-            font-size: 16px;
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
     <!-- Header -->
     <div class="header">
-        <a href="{{ url_for('home') }}" class="header-btn">
+        <a href="/home" class="header-btn">
             <svg viewBox="0 0 24 24">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
         </a>
-        <div class="header-title">История</div>
-        <div style="width: 40px;"></div>
+        <div class="header-title">История транзакций</div>
+        <div style="width: 38px;"></div>
     </div>
 
     <div class="container">
-        <h1 class="page-title">📝 История операций</h1>
-        
-        {% if transactions %}
-        <div class="transactions-list">
-            {% for trans in transactions %}
-            <div class="transaction-item">
-                <div class="transaction-icon {% if trans.type == 'deposit' or trans.type == 'transfer_in' or trans.type == 'admin_give' %}income{% else %}outcome{% endif %}">
-                    {% if trans.type == 'deposit' or trans.type == 'transfer_in' or trans.type == 'admin_give' %}↓{% else %}↑{% endif %}
+        <div class="page-header">
+            <h1 class="page-title">Выписка</h1>
+            <p class="page-subtitle">Все операции по кошельку USDT</p>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-chip active" onclick="filterTransactions('all', this)">Все</button>
+            <button class="filter-chip" onclick="filterTransactions('income', this)">Пополнения</button>
+            <button class="filter-chip" onclick="filterTransactions('outcome', this)">Списания</button>
+        </div>
+
+        <% if (transactions && transactions.length > 0) { %>
+        <div class="glass-card-container" id="transactionsList">
+            <% transactions.forEach(function(trans) { 
+                const isIncome = trans.type === 'deposit' || trans.type === 'transfer_in' || trans.type === 'admin_give';
+            %>
+            <div class="transaction-row" data-category="<%= isIncome ? 'income' : 'outcome' %>">
+                <div class="trans-icon-bubble <%= isIncome ? 'income' : 'outcome' %>">
+                    <%= isIncome ? '↓' : '↑' %>
                 </div>
-                <div class="transaction-info">
-                    <div class="transaction-type">
-                        {% if trans.type == 'deposit' %}Пополнение
-                        {% elif trans.type == 'transfer_in' %}Перевод получен
-                        {% elif trans.type == 'transfer_out' %}Перевод отправлен
-                        {% elif trans.type == 'admin_give' %}Начисление
-                        {% elif trans.type == 'withdraw' %}Вывод
-                        {% else %}Операция{% endif %}
+                <div class="trans-meta">
+                    <div class="trans-type-title">
+                        <% if (trans.type === 'deposit') { %>Пополнение счета
+                        <% } else if (trans.type === 'transfer_in') { %>Входящий перевод
+                        <% } else if (trans.type === 'transfer_out') { %>Исходящий перевод
+                        <% } else if (trans.type === 'admin_give') { %>Начисление бонуса
+                        <% } else if (trans.type === 'withdraw') { %>Вывод средств
+                        <% } else { %>Операция<% } %>
                     </div>
-                    {% if trans.description %}
-                    <div class="transaction-desc">{{ trans.description }}</div>
-                    {% endif %}
-                    <div class="transaction-date">{{ trans.date }}</div>
+                    <% if (trans.description) { %>
+                    <div class="trans-desc"><%= trans.description %></div>
+                    <% } %>
+                    <div class="trans-date"><%= trans.date %></div>
                 </div>
-                <div class="transaction-amount {% if trans.type == 'deposit' or trans.type == 'admin_give' or trans.type == 'transfer_in' %}positive{% else %}negative{% endif %}">
-                    {% if trans.type == 'deposit' or trans.type == 'admin_give' or trans.type == 'transfer_in' %}+{% else %}-{% endif %}{{ "%.2f"|format(trans.amount) }} ₽
+                <div class="trans-amount-col">
+                    <div class="trans-val <%= isIncome ? 'positive' : 'negative' %>">
+                        <%= isIncome ? '+' : '-' %><%= Number(trans.amount).toFixed(2) %> USDT
+                    </div>
+                    <div class="trans-status-badge">Завершено</div>
                 </div>
             </div>
-            {% endfor %}
+            <% }); %>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
-            <p>История транзакций пуста</p>
+        <% } else { %>
+        <div class="glass-card-container empty-state">
+            <div class="empty-state-icon">💎</div>
+            <p style="font-size: 16px; font-weight: 600; color: #FFFFFF; margin-bottom: 6px;">Операций пока нет</p>
+            <p style="font-size: 13px;">История транзакций появится после первой операции</p>
         </div>
-        {% endif %}
+        <% } %>
     </div>
+
+    <script>
+        function filterTransactions(type, btn) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+
+            const rows = document.querySelectorAll('.transaction-row');
+            rows.forEach(row => {
+                if (type === 'all') {
+                    row.style.display = 'flex';
+                } else {
+                    const cat = row.getAttribute('data-category');
+                    row.style.display = (cat === type) ? 'flex' : 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>

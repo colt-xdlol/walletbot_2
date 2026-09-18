@@ -2,69 +2,371 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Админ-панель</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Админ-панель - Telegram Wallet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-card: rgba(26, 28, 36, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 0 rgba(0, 0, 0, 0.35);
+            --accent-blue: #0A84FF;
+            --accent-cyan: #64D2FF;
+            --accent-green: #30D158;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --text-tertiary: rgba(255, 255, 255, 0.42);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
+            background: #07080B;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ambient-glow-1 {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(10, 132, 255, 0.22) 0%, rgba(191, 90, 242, 0.12) 50%, transparent 75%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 24px 18px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glass Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), var(--glass-specular);
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-link {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .action-link:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .logout-btn {
+            background: rgba(255, 69, 58, 0.14);
+            border-color: rgba(255, 69, 58, 0.25);
+            color: #FF453A;
+        }
+
+        /* iOS Segmented Tabs */
+        .admin-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.12);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+        }
+
+        /* Glass Tab Content */
+        .tab-content {
+            display: none;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.6), var(--glass-specular);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content h2 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 18px;
+            color: #FFFFFF;
+        }
+
+        .admin-actions {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .form-group label {
+            width: 100%;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        input {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #FFFFFF;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.25);
+        }
+
+        .btn-primary {
+            padding: 12px 20px;
+            background: linear-gradient(180deg, #0A84FF 0%, #0066D6 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(10, 132, 255, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        /* Glass Table */
+        .admin-table {
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge.active {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--accent-green);
+        }
+
+        .badge.banned {
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--accent-red);
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ban {
+            background: rgba(255, 69, 58, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 69, 58, 0.3);
+        }
+
+        .btn-unban {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+        }
+
+        .positive { color: var(--accent-green); font-weight: 600; }
+        .negative { color: var(--accent-red); font-weight: 600; }
     </style>
 </head>
 <body>
+    <div class="ambient-glow-1"></div>
+
     <div class="container">
         <header>
-            <h1>⚙️ Админ</h1>
-            <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+            <h1>⚙️ Админ-панель</h1>
+            <div class="nav-links">
+                <a href="/home" class="action-link">Кошелек</a>
+                <a href="/logout" class="action-link logout-btn">Выйти</a>
+            </div>
         </header>
         
         <div class="admin-tabs">
-            <button class="tab-btn active" onclick="showTab('users')">👥 Юзеры</button>
+            <button class="tab-btn active" onclick="showTab('users')">👥 Пользователи</button>
             <button class="tab-btn" onclick="showTab('transactions')">📝 Транзакции</button>
-            <button class="tab-btn" onclick="showTab('settings')">⚙️ Настройки</button>
+            <button class="tab-btn" onclick="showTab('settings')">⚙️ Лимиты</button>
         </div>
         
         <div id="usersTab" class="tab-content active">
-            <h2>Пользователи</h2>
+            <h2>Управление пользователями</h2>
             <div class="admin-actions">
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 0;">
                     <input type="number" id="giveUserId" placeholder="Telegram ID">
-                    <input type="number" step="0.01" id="giveAmount" placeholder="Сумма">
-                    <button onclick="giveBalance()" class="btn-primary" style="padding: 12px 20px;">Выдать</button>
+                    <input type="number" step="0.01" id="giveAmount" placeholder="Сумма USDT">
+                    <button onclick="giveBalance()" class="btn-primary">Выдать</button>
                 </div>
             </div>
             <div id="usersList" class="admin-table"></div>
         </div>
         
         <div id="transactionsTab" class="tab-content">
-            <h2>Все транзакции</h2>
+            <h2>Все транзакции системы</h2>
             <div id="transactionsList" class="admin-table"></div>
         </div>
         
         <div id="settingsTab" class="tab-content">
-            <h2>Настройки лимитов</h2>
+            <h2>Лимиты кошелька</h2>
             <form id="settingsForm">
                 <div class="form-group">
-                    <label>Мин. пополнение (₽)</label>
+                    <label>Мин. пополнение (USDT)</label>
                     <input type="number" step="0.01" id="minDeposit" required>
                 </div>
                 <div class="form-group">
-                    <label>Макс. пополнение (₽)</label>
+                    <label>Макс. пополнение (USDT)</label>
                     <input type="number" step="0.01" id="maxDeposit" required>
                 </div>
                 <div class="form-group">
-                    <label>Мин. вывод (₽)</label>
+                    <label>Мин. вывод (USDT)</label>
                     <input type="number" step="0.01" id="minWithdraw" required>
                 </div>
                 <div class="form-group">
-                    <label>Макс. вывод (₽)</label>
+                    <label>Макс. вывод (USDT)</label>
                     <input type="number" step="0.01" id="maxWithdraw" required>
                 </div>
-                <button type="submit" class="btn-primary">Сохранить</button>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Сохранить параметры</button>
             </form>
         </div>
     </div>
     
-    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    <script src="/static/admin.js"></script>
 </body>
 </html>
